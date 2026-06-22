@@ -1,0 +1,77 @@
+Here is a clear **academic description focused only on the project context, what was implemented, and its importance**:
+
+***
+
+# **Project Description**
+
+## **Context**
+
+The project is part of an initiative aimed at improving the **monitoring and visualization of IT operational data** within an organization. Several internal systems generate important information related to:
+
+* Changes applied to applications
+* Ongoing and past incidents
+* Identified problems affecting services
+
+These data sources are essential for tracking the **health and stability of IT systems**, but they are not directly accessible in a consolidated and user-friendly format.
+
+To address this need, a **Bond Weather Portal** was developed. This portal acts as a centralized dashboard that displays:
+
+* Ongoing changes and recent changes
+* Active and recent incidents
+* Problems impacting services
+
+The portal requires **continuously updated and structured data** to provide an accurate view of the system’s operational status.
+
+***
+
+## **What Was Implemented**
+
+To feed this portal, a **data pipeline system based on Apache Airflow** was designed and implemented.
+
+The project consists of several **DAGs (Directed Acyclic Graphs)**, each responsible for a specific type of data:
+
+* Changes
+* Incidents
+* Problems
+* Data cleaning
+
+A shared utility layer was also developed to standardize configuration, authentication, and interactions with external systems.
+
+The implemented workflows perform the following operations:
+
+### **1. Data Collection**
+
+* Retrieve data from an internal ITSM system (Unity)
+* Collect information for multiple assignment groups
+* Ensure that only relevant and recent data is processed
+
+### **2. Data Processing**
+
+* Filter data according to defined time windows
+* Normalize and structure the information
+* Prepare it for use in the portal
+
+### **3. Data Synchronization**
+
+* Send the processed data to a Strapi backend
+* Create new records or update existing ones
+* Maintain consistency between the source system and the portal
+
+### **4. Automation**
+
+* Execute all workflows automatically on a scheduled basis
+* Ensure continuous updates of the portal data
+* Provide monitoring through logging and status tracking
+
+***
+
+## **Importance of the Project**
+
+This project plays a key role in improving **operational visibility and decision-making**.
+
+* It provides a **centralized view** of critical IT activities
+* It ensures that information displayed on the portal is **up-to-date and reliable**
+* It automates data integration, reducing **manual effort and errors**
+* It enhances the ability of teams to **monitor ongoing changes and quickly react to incidents**
+
+Overall, the project contributes to a more efficient and transparent management of IT operations by transforming raw system data into **actionable insights displayed in real time**.
