@@ -1,0 +1,366 @@
+Parfait ✅ — là je vais te rédiger une **partie complète, structurée, académique et valorisante**, en intégrant tout ce que tu as fait (migration complète Jenkins → Airflow, architecture, connecteurs, alerting, ingestion, etc.).
+
+👉 C’est prêt **pour ton rapport d’alternance** 👇
+
+***
+
+# 📘 Mission : Migration et industrialisation du pipeline DUAR vers Apache Airflow
+
+## 1. Contexte général
+
+Dans le cadre de mon alternance, j’ai participé à un projet visant à améliorer et industrialiser le processus de **collecte des données d’accès utilisateurs (DUAR – Data User Access Review)** pour plusieurs applications DevOps de l’entreprise (GitHub Enterprise, Jenkins, SonarQube, Artifactory, etc.).
+
+Initialement, ce processus reposait sur des scripts exécutés dans **Jenkins**, avec une architecture peu flexible et difficilement maintenable. Dans une logique d’industrialisation et de modernisation, il a été décidé de **migrer l’ensemble du pipeline DUAR vers Apache Airflow**, un outil d’orchestration de workflows plus adapté aux besoins de traitement de données.
+
+Cette migration représentait un enjeu important, car elle impliquait :
+
+* la reprise de l’existant
+* l’uniformisation des traitements
+* l’amélioration de la qualité et de la robustesse du code
+* la mise en production d’une architecture scalable
+
+***
+
+## 2. Objectifs de la mission
+
+Les principaux objectifs de cette mission étaient les suivants :
+
+* ✅ Migrer l’intégralité du pipeline DUAR de Jenkins vers Airflow
+* ✅ Concevoir une architecture modulaire et réutilisable pour plusieurs applications
+* ✅ Harmoniser les connecteurs d’extraction de données
+* ✅ Améliorer la logique de traitement et d’enrichissement des utilisateurs
+* ✅ Automatiser les processus d’ingestion dans la plateforme Big Data
+* ✅ Mettre en place un système de monitoring et d’alerte
+
+Cette mission s’inscrivait ainsi dans une démarche globale d’**industrialisation des flux de données et d’amélioration de la gouvernance des accès**.
+
+***
+
+## 3. Architecture mise en place
+
+Dans le cadre de cette migration, j’ai conçu une architecture organisée et modulaire, structurée autour de plusieurs composants :
+
+```
+dags/
+utils/
+  ├── connectors/
+  ├── generate_extract_file/
+  ├── data_ingestion/
+  ├── s3_storage/
+  ├── alerting.py
+  ├── mailing.py
+```
+
+***
+
+### 3.1 Approche modulaire
+
+L’architecture repose sur une séparation claire des responsabilités :
+
+* **Connectors** : responsables de l’extraction des données depuis les APIs des différentes applications
+* **Generate\_extract\_file** : gestion du traitement, de l’enrichissement et de la génération du fichier DUAR
+* **Data\_ingestion** : gestion de l’intégration vers la plateforme Big Data
+* **S3\_storage** : gestion du stockage intermédiaire des fichiers
+* **Alerting et mailing** : gestion des notifications et des erreurs
+
+Cette organisation permet une **meilleure maintenabilité, lisibilité et extensibilité**.
+
+***
+
+## 4. Mise en place d’un DAG dynamique
+
+Un élément clé de la solution a été la mise en place d’un **DAG dynamique Airflow**.
+
+Plutôt que de créer un DAG par application de manière statique, une approche basée sur une configuration dynamique a été adoptée :
+
+```python
+def get_platforms():
+    return json.loads(Variable.get("duar_platforms"))
+```
+
+👉 Chaque plateforme est définie dans une variable Airflow, ce qui permet :
+
+* d’ajouter facilement de nouvelles applications
+* de centraliser la configuration
+* de réduire la duplication de code
+
+***
+
+### 4.1 Génération automatique des DAGs
+
+Un **DAG factory** permet de générer automatiquement un DAG pour chaque plateforme :
+
+```python
+for platform_conf in get_platforms():
+    dag = build_dag(platform_conf)
+    globals()[dag.dag_id] = dag
+```
+
+👉 Cette approche permet :
+
+* une **scalabilité** du système
+* une **standardisation des traitements**
+* une **réduction du temps de développement pour de nouvelles intégrations**
+
+***
+
+## 5. Pipeline de traitement
+
+Chaque DAG est structuré en deux étapes principales :
+
+***
+
+### 5.1 Génération du fichier DUAR
+
+Cette étape inclut :
+
+* l’extraction des utilisateurs via les connecteurs
+* l’enrichissement des données via le référentiel CDP
+* la génération du fichier CSV conforme au modèle DUAR
+
+👉 Le traitement est réalisé via :
+
+```python
+user_csv = generate_duar_file(extraction_config)
+```
+
+***
+
+### 5.2 Ingestion des données
+
+Une fois le fichier généré :
+
+* il est stocké dans un Object Storage (S3 compatible)
+* il est ensuite injecté dans l’API **My BigData**
+
+```python
+ingest_data(ingestion_config, file_bytes)
+```
+
+👉 Cette étape permet l’intégration des données dans le système d’information pour exploitation.
+
+***
+
+## 6. Amélioration des connecteurs
+
+Dans le cadre de cette migration, j’ai également :
+
+* ✅ Revu et harmonisé les connecteurs existants
+* ✅ Corrigé des incohérences de formats de données
+* ✅ Amélioré la gestion des erreurs (retry, logs, validation)
+* ✅ Ajouté de nouveaux connecteurs (ex : GitHub EMU)
+
+Chaque connecteur a été adapté pour :
+
+* respecter un format uniforme
+* assurer une compatibilité avec le pipeline DUAR
+* garantir la fiabilité des données collectées
+
+***
+
+## 7. Gestion des secrets et configuration
+
+La solution intègre une gestion sécurisée des configurations via **Vault** :
+
+```python
+fetch_from_vault(platform_conf)
+```
+
+👉 permet de récupérer :
+
+* les configurations d’extraction
+* les paramètres d’ingestion
+* les credentials
+
+Cela garantit la **sécurité et la centralisation des paramètres sensibles**.
+
+***
+
+## 8. Mise en place du monitoring et alerting
+
+Un système de suivi et d’alerte a été mis en place afin d’assurer la robustesse du pipeline :
+
+* 📩 Notifications par email en cas d’échec
+* 🚨 Intégration avec **Alerta** pour le monitoring
+
+```python
+send_failure_notification(platform_name)
+send_alert_to_alerta(...)
+```
+
+👉 Cela permet :
+
+* une **réactivité en cas d’incident**
+* une **visibilité sur les pipelines en production**
+
+***
+
+## 9. Résultats et apports
+
+À l’issue de cette mission, les résultats suivants ont été obtenus :
+
+* ✅ Migration complète des pipelines DUAR de Jenkins vers Airflow
+* ✅ Mise en place d’une architecture modulaire et scalable
+* ✅ Industrialisation du traitement de plusieurs applications
+* ✅ Automatisation de l’ingestion des données dans la plateforme Big Data
+* ✅ Amélioration de la robustesse et de la qualité des données
+
+***
+
+## 10. Conclusion
+
+Cette mission a permis de transformer un processus initialement fragmenté et peu maintenable en une solution **industrielle, fiable et évolutive**.
+
+La mise en place d’un DAG dynamique, combinée à une architecture modulaire, constitue un socle solide pour l’intégration de nouvelles applications et l’extension du dispositif DUAR.
+
+Enfin, ce projet m’a permis de développer des compétences avancées en :
+
+* orchestration de workflows (Airflow)
+* intégration de données
+* architecture logicielle
+* gestion des API et des systèmes distribués
+
+
+
+____________________________________________________________________________________________________________________________
+Voici une **rédaction académique complète, valorisante et structurée** que tu peux intégrer directement dans ton rapport d’alternance 👇
+
+***
+
+# 📘 Mission : Mise en place d’un pipeline d’extraction DUAR pour les plateformes DevOps (GitHub EMU)
+
+## 1. Contexte de la mission
+
+Dans le cadre de mon alternance, j’ai été intégré à un projet stratégique visant à alimenter le dispositif **DUAR (Data User Access Review)**. Ce dispositif permet de répondre à des enjeux majeurs de gouvernance des accès, de sécurité et de conformité réglementaire au sein du système d’information de l’entreprise.
+
+L’objectif global du projet était de **collecter, fiabiliser et centraliser les données d’accès utilisateurs** provenant de différentes plateformes techniques (telles que GitHub Enterprise, Jenkins, SonarQube, etc.), afin de permettre leur exploitation dans des processus d’audit et de revue des habilitations.
+
+Ma mission s’est concentrée plus particulièrement sur l’application **GitHub Enterprise (EMU)**, pour laquelle aucun pipeline d’extraction DUAR n’était encore opérationnel.
+
+***
+
+## 2. Objectifs et attentes
+
+Les objectifs de cette mission étaient multiples :
+
+* ✅ **Développer un connecteur technique** permettant de collecter les utilisateurs via l’API SCIM de GitHub Enterprise
+* ✅ **Transformer et standardiser les données** conformément au modèle DUAR attendu
+* ✅ **Intégrer un mécanisme d’enrichissement des données utilisateurs** via le référentiel interne (CDP – Central Directory Platform)
+* ✅ **Automatiser le traitement dans un pipeline Airflow**, permettant une exécution planifiée
+* ✅ **Générer un fichier d’extraction au format standard DUAR (CSV)**
+* ✅ **Assurer l’ingestion des données dans la plateforme Big Data de l’entreprise**
+* ✅ Garantir la robustesse, la traçabilité et la résilience du pipeline
+
+Cette mission s’inscrivait ainsi dans une logique de **mise en production d’un flux de données critique**, avec des contraintes fortes en termes de qualité, de sécurité et de maintenabilité.
+
+***
+
+## 3. Travaux réalisés
+
+### 3.1 Développement du connecteur GitHub EMU
+
+La première étape a consisté à développer un connecteur en Python permettant d’interroger l’API SCIM de GitHub Enterprise. Cette API fournit les informations relatives aux utilisateurs (identité, email, rôles, identifiants externes, etc.).
+
+Le connecteur implémente notamment :
+
+* Un mécanisme d’authentification sécurisé basé sur un token
+* Une gestion de la pagination des résultats
+* Un mapping des données vers le modèle DUAR
+* Une gestion des erreurs (retry, contrôle des statuts HTTP, logs)
+
+***
+
+### 3.2 Intégration dans un pipeline Airflow
+
+Le connecteur a été intégré dans un pipeline orchestré par **Apache Airflow**, structuré en deux étapes principales :
+
+1. **Génération du fichier DUAR**
+   * Extraction des utilisateurs
+   * Enrichissement via le référentiel CDP
+   * Construction du fichier CSV conforme au modèle attendu
+
+2. **Ingestion des données**
+   * Upload du fichier dans un stockage objet (Object Storage)
+   * Déclenchement de l’ingestion via l’API My BigData
+
+Ce pipeline a été paramétré pour être **rejouable, extensible et adapté à plusieurs plateformes** via une configuration centralisée.
+
+***
+
+### 3.3 Gestion de l’enrichissement via CDP
+
+Une étape importante de la mission a consisté à intégrer un mécanisme d’enrichissement via une API interne (CDP). Cette étape permet d’ajouter des informations critiques telles que le GGI (Global Group Identifier), nécessaire à la conformité DUAR.
+
+Des adaptations ont été nécessaires pour :
+
+* Gérer les **différences de référentiels** (GitHub vs CDP)
+* Implémenter des logiques de **fallback** lorsque certaines données étaient manquantes
+* Filtrer ou qualifier les comptes techniques (service accounts)
+
+***
+
+### 3.4 Industrialisation et robustesse
+
+Le pipeline a été conçu avec une attention particulière portée à :
+
+* La **gestion des erreurs** (logs détaillés, monitoring)
+* La **résilience réseau (retry, timeouts)**
+* La **séparation des responsabilités (connecteurs, traitement, ingestion)**
+* La **configurabilité via variables Airflow et secrets Vault**
+
+Cette approche permet d’assurer une **maintenabilité et une évolutivité du système dans un contexte industriel**.
+
+***
+
+## 4. Résultats et livrables
+
+À l’issue de cette mission, les éléments suivants ont été livrés :
+
+* ✅ Un **connecteur GitHub EMU opérationnel**
+* ✅ Un **pipeline Airflow complet déployé en environnement de production (PRD)**
+* ✅ Un **fichier d’extraction DUAR conforme aux exigences**
+* ✅ Une **intégration réussie avec la plateforme My BigData**
+
+L’ingestion des données a été effectuée avec succès via l’API interne :
+
+* **Ingestion ID : 740653**
+* Fichier livré au format standard DUAR
+
+***
+
+## 5. Difficultés rencontrées
+
+Plusieurs défis techniques ont été rencontrés au cours de la mission :
+
+* Gestion des **différences entre identifiants GitHub et référentiel interne (CDP)**
+* Traitement des **comptes techniques ou non référencés**
+* Debug de pipelines distribués (Airflow, API, stockage objet)
+* Alignement des formats de données entre différentes sources
+
+Ces difficultés ont été résolues grâce à une démarche itérative, combinant **debug, instrumentation des logs et adaptation de la logique métier**.
+
+***
+
+## 6. Apports et compétences développées
+
+Cette mission m’a permis de développer des compétences solides en :
+
+* ✅ Développement Python appliqué à l’intégration de données
+* ✅ Orchestration de workflows avec Apache Airflow
+* ✅ Consommation et sécurisation d’APIs REST
+* ✅ Manipulation de données (transformation, qualité, enrichissement)
+* ✅ Compréhension des enjeux de gouvernance des accès (DUAR)
+* ✅ Debug et résolution de problèmes complexes en environnement distribué
+
+Elle m’a également permis de contribuer à un projet à fort impact, en participant à la **mise en production d’un pipeline critique pour la conformité de l’entreprise**.
+
+***
+
+## 7. Conclusion
+
+La réalisation de cette mission a permis de fournir une solution robuste et industrialisée pour l’extraction des données DUAR de GitHub Enterprise. Ce travail s’inscrit dans une démarche globale de sécurisation des accès et de conformité réglementaire.
+
+Il constitue également une base réutilisable pour l’intégration de nouvelles plateformes, contribuant ainsi à la standardisation des processus au sein du système d’information.
+
+***
+
