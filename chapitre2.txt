@@ -1,0 +1,139 @@
+Parfait — voici **le Chapitre 2 complet, rédigé de manière académique**, avec les trois parties que tu veux, et une **version concise de DoITnow intégrée**.
+
+***
+
+# **Chapitre 2 : Présentation de l’environnement de travail**
+
+## **2.1 Présentation de Société Générale**
+
+Société Générale est l’un des principaux groupes bancaires européens, fondé en 1864 en France. Le groupe intervient dans plusieurs domaines d’activité, notamment la banque de détail, la banque de financement et d’investissement, ainsi que les services financiers spécialisés.
+
+Présente à l’international, Société Générale accompagne ses clients (particuliers, entreprises et institutions) en proposant une large gamme de services financiers adaptés à leurs besoins. Dans un contexte de transformation digitale, la banque investit fortement dans les technologies numériques et le cloud afin d’améliorer la performance, la sécurité et l’innovation de ses services.
+
+Cette transformation s’appuie notamment sur des infrastructures modernes et sur des équipes techniques spécialisées, telles que les équipes **SRE (Site Reliability Engineering)** et **DevOps**, qui jouent un rôle clé dans la fiabilité et la scalabilité des systèmes.
+
+***
+
+## **2.2 Présentation de l’équipe SRE (Structure, rôle et responsabilités)**
+
+### **Structure de l’équipe SRE**
+
+L’équipe SRE (Site Reliability Engineering) s’inscrit dans une organisation orientée **DevOps**, favorisant la collaboration entre les équipes de développement et d’exploitation.
+
+Elle est généralement composée de :
+
+* **SRE Engineers** : responsables de la fiabilité des systèmes
+* **DevOps Engineers** : en charge de l’automatisation et des pipelines
+* **Tech Leads / Managers** : pilotage technique et organisationnel
+* Collaboration directe avec les équipes de développement applicatif
+
+Cette organisation permet de garantir une approche transversale entre le développement, l’exploitation et la supervision des applications.
+
+***
+
+### **Rôle de l’équipe SRE**
+
+Le rôle principal de l’équipe SRE est d’assurer la **disponibilité, la performance et la résilience des systèmes informatiques**.
+
+Elle agit comme un lien entre :
+
+* Les équipes de développement (build)
+* Les équipes d’exploitation (run)
+
+Les SRE appliquent des principes d’ingénierie pour automatiser les opérations et améliorer la fiabilité des services.
+
+***
+
+### **Responsabilités**
+
+Les principales responsabilités de l’équipe SRE incluent :
+
+* **Supervision et monitoring** des applications et infrastructures
+* **Gestion des incidents** et amélioration continue (post-mortem, RCA)
+* **Automatisation des tâches** (déploiement, provisioning, scaling)
+* **Gestion de la performance et de la capacité**
+* **Mise en place de pratiques DevOps** (CI/CD, Infrastructure as Code)
+* **Garantir la haute disponibilité (SLA/SLO)** des services
+
+L’équipe contribue également à la **réduction du temps de résolution des incidents (MTTR)** et à l’amélioration continue des systèmes.
+
+***
+
+## **2.3 Environnement technique et méthodologique**
+
+### **2.3.1 Plateforme DoITnow (résumé)**
+
+Dans le cadre de ses activités cloud, Société Générale utilise la plateforme **DoITnow**, qui constitue la **console web de la SG Cloud Platform**.
+
+DoITnow est un outil centralisé permettant aux utilisateurs :
+
+* D’accéder aux services cloud
+* De consommer des APIs facilement
+* De gérer leurs ressources via une interface intuitive
+
+La plateforme agit comme un **intermédiaire** en exécutant les appels API au nom de l’utilisateur, ce qui simplifie l’utilisation des services cloud.
+
+Ses principales fonctionnalités incluent :
+
+* Gestion des ressources (VM, bases de données, réseau, stockage)
+* Gestion des accès (rôles et permissions)
+* Suivi de la consommation (billing)
+* Accès à la documentation et à l’état des services
+* Support via communication directe avec les équipes cloud
+
+DoITnow facilite ainsi le développement d’applications cloud natives et améliore la productivité des équipes techniques.
+
+***
+
+### **2.3.2 Stack technique (équipe DevOps/SRE)**
+
+L’environnement technique d’une équipe SRE/DevOps repose sur un ensemble d’outils permettant d’assurer l’automatisation, la supervision et la fiabilité des systèmes.
+
+#### **Infrastructure et Cloud**
+
+* Cloud interne SG Cloud Platform / cloud providers
+* Conteneurisation avec **Docker**
+* Orchestration avec **Kubernetes**
+
+#### **CI/CD (Intégration et déploiement continu)**
+
+* Outils : Jenkins, GitLab CI ou GitHub Actions
+* Automatisation des pipelines de build, test et déploiement
+
+#### **Infrastructure as Code**
+
+* **Terraform** ou outils similaires
+* Gestion des environnements de manière automatisée
+
+#### **Monitoring et Observabilité**
+
+* **Prometheus / Grafana** pour les métriques
+* **ELK Stack (Elasticsearch, Logstash, Kibana)** pour les logs
+* Alerting pour la détection proactive des incidents
+
+#### **Gestion des versions**
+
+* Git (GitLab / GitHub)
+
+***
+
+### **2.3.3 Méthodologie de travail**
+
+L’équipe adopte des pratiques agiles et DevOps :
+
+* **Méthodes Agile (Scrum/Kanban)**
+* Déploiements fréquents et automatisés
+* Culture de collaboration (Dev + Ops)
+* Amélioration continue
+
+L’objectif est de livrer rapidement tout en garantissant la fiabilité et la qualité des services.
+
+***
+
+## **Conclusion du chapitre**
+
+L’environnement de travail au sein de Société Générale repose sur une combinaison de **technologies cloud modernes**, de **pratiques DevOps** et d’une organisation orientée **fiabilité** avec les équipes SRE.
+
+La plateforme DoITnow joue un rôle central dans cet écosystème en simplifiant l’accès aux services cloud, tandis que la stack technique et les méthodologies adoptées permettent d’assurer des systèmes performants, sécurisés et hautement disponibles.
+
+
