@@ -1,0 +1,157 @@
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.models import Variable
+from airflow.hooks.base import BaseHook
+from datetime import datetime
+import json
+import logging
+from utils.mailing import send_failure_notification
+from utils.alerting import send_alert_to_alerta
+from utils.generate_extract_file.create_duar_file import generate_duar_file
+
+# =====================================================
+# PLATFORMS
+# =====================================================
+def get_platforms():
+    return json.loads(Variable.get("duar_platforms"))
+
+
+# =====================================================
+# VAULT FETCH 
+# =====================================================
+def fetch_from_vault(platform_conf):
+    import hvac
+
+    conn = BaseHook.get_connection(platform_conf["vault_conn_id"])
+
+    client = hvac.Client(
+        url=conn.host,
+        namespace=platform_conf["vault_namespace"]
+    )
+    client.auth.approle.login(
+        role_id=conn.login,
+        secret_id=conn.password
+    )
+
+    extraction_secret = client.secrets.kv.v2.read_secret_version(
+        path=platform_conf["vault_extraction_secret_path"],
+        mount_point="kv"
+    )
+
+    ingestion_secret = client.secrets.kv.v2.read_secret_version(
+        path=platform_conf["vault_ingestion_secret_path"],
+        mount_point="kv"
+    )
+
+    extraction_data = extraction_secret["data"]["data"]["data"]
+    ingestion_data = ingestion_secret["data"]["data"]["data"]
+
+    return extraction_data, ingestion_data
+
+
+# =====================================================
+# DAG FACTORY
+# =====================================================
+def build_dag(platform_conf):
+    platform_name = platform_conf["platform_name"]
+    dag_id = f"perform_duar_{platform_name}"
+
+    # -------------------------------------------------
+    # FAILURE CALLBACK
+    # -------------------------------------------------
+    def on_dag_failure(context):
+        send_failure_notification(platform_name)
+        conn = BaseHook.get_connection("duar-alerta")
+        send_alert_to_alerta(conn.host, conn.password, platform_name)
+
+    def on_dag_success(context):
+        send_notification(platform_conf["platform_name"])
+
+    # -------------------------------------------------
+    # TASK 1 — GENERATE DUAR FILE
+    # -------------------------------------------------
+    def run_generate_file(**context):
+        from utils.s3_storage.s3_storage import upload_csv_to_s3
+        import datetime
+
+        extraction_config, _ = fetch_from_vault(platform_conf)
+
+        user_csv = generate_duar_file(extraction_config)
+
+        filename = (
+            f"{extraction_config['irt']}_"
+            f"{extraction_config['trigram']}_"
+            f"{extraction_config['app_name']}.csv"
+        )
+
+        s3_conn = BaseHook.get_connection(platform_conf["s3_access_keys"])
+
+        upload_csv_to_s3(
+            user_csv,
+            s3_conn.extra_dejson["region"],
+            s3_conn.extra_dejson["s3_endpoint"],
+            s3_conn.extra_dejson["s3_bucket"],
+            filename,
+            s3_conn.login,
+            s3_conn.password
+        )
+
+        context["ti"].xcom_push(key="duar_filename", value=filename)
+
+    # -------------------------------------------------
+    # TASK 2 — INGEST DATA
+    # -------------------------------------------------
+    def run_ingest_data(**context):
+        from utils.s3_storage.s3_storage import download_csv_from_s3
+        from utils.data_ingestion.ingest_data import ingest_data
+
+        _, ingestion_config = fetch_from_vault(platform_conf)
+
+        filename = context["ti"].xcom_pull(task_ids="generate_duar_file",key="duar_filename")
+
+        s3_conn = BaseHook.get_connection(platform_conf["s3_access_keys"])
+
+        file_bytes = download_csv_from_s3(
+            s3_conn.extra_dejson["region"],
+            s3_conn.extra_dejson["s3_endpoint"],
+            s3_conn.extra_dejson["s3_bucket"],
+            filename,
+            s3_conn.login,
+            s3_conn.password
+        )
+
+        ingest_data(ingestion_config, file_bytes)
+
+    # =================================================
+    # DAG 
+    # =================================================
+    with DAG(
+        dag_id=dag_id,
+        start_date=datetime(2023, 1, 1),
+        schedule="0 1 * * *",
+        catchup=False,
+        tags=["DUAR", platform_name],
+        on_failure_callback=on_dag_failure,
+    ) as dag:
+
+        generate_duar = PythonOperator(
+            task_id="generate_duar_file",
+            python_callable=run_generate_file
+        )
+
+        ingest_duar = PythonOperator(
+            task_id="ingest_duar_file",
+            python_callable=run_ingest_data
+        )
+
+        generate_duar >> ingest_duar
+
+    return dag
+
+
+# =====================================================
+# DAG REGISTRATION
+# =====================================================
+for platform_conf in get_platforms():
+    dag = build_dag(platform_conf)
+    globals()[dag.dag_id] = dag
