@@ -1,0 +1,37 @@
+Here is a **brief and clean academic description**, aligned with an in-progress Airflow project:
+
+***
+
+# **Project Description – Artifact Archiving with Airflow (In Progress)**
+
+## **Context**
+
+This project focuses on improving the **management of artifacts stored in a JFrog Artifactory instance**. As repositories grow over time, it becomes necessary to archive unused or outdated artifacts in order to optimize storage and maintain system performance.
+
+The goal is to implement a **fully automated archiving process using Apache Airflow**, integrated into the existing data pipeline ecosystem.
+
+***
+
+## **Proposed Solution (In Progress)**
+
+The solution being developed consists of creating **Airflow DAGs** that orchestrate the artifact lifecycle management. The workflow includes:
+
+* **Identifying artifacts to archive** based on defined criteria
+* **Transferring artifacts** from Artifactory to an external storage system (e.g., S3)
+* **Cleaning the repository** by removing archived files
+* **Maintaining references** to archived artifacts for traceability
+* **Processing artifacts in parallel** to ensure scalability and efficiency
+
+The pipeline is still under development, with ongoing work to adapt the logic into Airflow tasks, structure the DAGs, and ensure robust orchestration.
+
+***
+
+## **Importance**
+
+Once completed, this solution will:
+
+* Automate artifact archiving within a centralized orchestration platform
+* Improve storage efficiency and repository performance
+* Provide better monitoring, scheduling, and reliability through Airflow
+
+This project represents a step toward a **more scalable and maintainable artifact management system**.
