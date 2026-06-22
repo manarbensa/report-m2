@@ -1,0 +1,73 @@
+Here is a **clear and concise academic-style explanation** of your **combined CI/CD Airflow deployment project**, based on both repositories:
+
+***
+
+# **Project Description – CI/CD Pipeline for Airflow Deployment (In Progress)**
+
+## **Context**
+
+This project aims to improve the **deployment process of workflows and components on an Airflow instance**. The current approach relies on sequential API calls, where:
+
+* An artifact is created from a configuration
+* The system waits for its availability
+* A deployment is then triggered separately
+
+This process is **time-consuming and not optimized**, especially when managing multiple deployments or environments.
+
+***
+
+## **Proposed Solution (In Progress)**
+
+The objective is to design a **complete CI/CD pipeline** that automates and structures both **artifact creation (CI)** and **deployment (CD)** into a unified workflow.
+
+### **1. Continuous Integration (CI) – Artifact Creation**
+
+The CI part focuses on:
+
+* Building a **deployable artifact** for Airflow
+* Defining its content through a structured configuration:
+  * Source code repositories (Git)
+  * Python dependencies
+  * System dependencies and storage resources
+* Standardizing artifact creation to ensure **consistency and reproducibility**
+* Producing an **artifact identifier** that will be reused in the deployment phase [\[groupsg001...epoint.com\]](https://groupsg001-my.sharepoint.com/personal/manar_bensaada_socgen_com1/Documents/Fichiers%20Microsoft%20Copilot%20Chat/deploy_artifact.py)
+
+***
+
+### **2. Continuous Deployment (CD) – Artifact Deployment**
+
+The CD part handles:
+
+* **Deploying the generated artifact** to a target Airflow instance
+* Supporting multiple environments (e.g., dev, test, prod) [\[groupsg001...epoint.com\]](https://groupsg001-my.sharepoint.com/personal/manar_bensaada_socgen_com1/Documents/Fichiers%20Microsoft%20Copilot%20Chat/cd.yaml)
+* Applying deployment configurations such as:
+  * Environment variables
+  * Secrets management (vault integration)
+  * Synchronization options
+* Monitoring the deployment until completion and ensuring it is successful [\[groupsg001...epoint.com\]](https://groupsg001-my.sharepoint.com/personal/manar_bensaada_socgen_com1/Documents/Fichiers%20Microsoft%20Copilot%20Chat/deploy_artifact.py)
+
+***
+
+### **3. End-to-End Workflow**
+
+The pipeline is designed to:
+
+1. Create an artifact from a defined configuration
+2. Pass the artifact identifier to the deployment stage
+3. Deploy the artifact automatically to the target Airflow instance
+4. Track the deployment process and ensure completion
+
+This removes the need for **manual chaining of API calls** and reduces waiting time between steps.
+
+***
+
+## **Importance**
+
+This project contributes to:
+
+* **Automating Airflow deployments** in a structured and reliable way
+* Reducing deployment time and operational complexity
+* Ensuring **reproducibility and consistency** across environments
+* Improving scalability when managing multiple pipelines
+
+Once completed, the solution will provide a **fully integrated CI/CD process**, aligning Airflow deployment with modern DevOps practices and significantly improving efficiency.
